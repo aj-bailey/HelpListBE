@@ -1,6 +1,26 @@
 require "rails_helper"
 
 RSpec.describe "User Request" do
+	describe "User Get" do
+		before do
+			@user = create(:user)
+			get api_v1_user_path(@user)
+			@parsed = JSON.parse(response.body, symbolize_names: true)
+		end
+
+		context "when successful" do
+			it "gets one user" do
+				expect(response).to be_successful
+				expect(@parsed[:data].keys).to eq([:id, :type, :attributes])
+				expect(@parsed[:data][:id]).to eq(@user.id.to_s)
+				expect(@parsed[:data][:type]).to eq("user")
+				expect(@parsed[:data][:attributes].size).to eq(2)
+				expect(@parsed[:data][:attributes][:email]).to eq(@user.email)
+				expect(@parsed[:data][:attributes][:user_type]).to eq("donor")
+			end
+		end
+	end
+
   describe "User Create" do
     it "creates a new user" do
       user_params = ({
